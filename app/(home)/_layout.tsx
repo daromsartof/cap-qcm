@@ -1,8 +1,9 @@
 
 import { Stack } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
+import { ThemedText as Text } from "@/components/ThemedText"
 export default function RootLayout() {
 
     return (

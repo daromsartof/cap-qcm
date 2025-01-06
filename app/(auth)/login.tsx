@@ -1,26 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import HalfBgContainer from '@/components/HalfBgContainer';
 import { Link } from 'expo-router';
-
+import { ThemedText as Text } from "@/components/ThemedText"
 const LoginScreen = () => {
     return (
-        <HalfBgContainer>
-            <View style={styles.header}>
-                <Text style={styles.title}>CAP QCM</Text>
-                <FontAwesome name="bars" size={24} color="#6D4C41" style={styles.menuIcon} />
-            </View>
-            <View style={styles.footer}>
-                <View style={styles.button}>
-                    <Link style={styles.buttonText} href={"/(singin)"}>Connexion</Link>
-                </View>
-                <View style={styles.button} >
-                    <Link style={styles.buttonText} href={"/(auth)/consent"}>Inscription</Link>
-                </View>
-            </View>
-        </HalfBgContainer>
+      <HalfBgContainer>
+        <View style={styles.header}>
+          <Text style={styles.title}>CAP QCM</Text>
+          <FontAwesome
+            name="bars"
+            size={24}
+            color="#6D4C41"
+            style={styles.menuIcon}
+          />
+        </View>
+        <View style={styles.footer}>
+          <View style={styles.button}>
+            <Link style={styles.buttonText} href={"/(singin)"}>
+              <Text>Connexion</Text>
+            </Link>
+          </View>
+          <View style={styles.button}>
+            <Link style={styles.buttonText} href={"/(auth)/consent"}>
+              <Text>Inscription</Text>
+            </Link>
+          </View>
+        </View>
+      </HalfBgContainer>
     )
 };
 

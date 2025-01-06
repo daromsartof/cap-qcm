@@ -1,53 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import FullBgContainer from '@/components/FullBgContainer';
 import { Link } from 'expo-router';
-
+import { ThemedText as Text } from "@/components/ThemedText"
 const ConnectionCodeScreen = () => {
     const [isConnected, setIsConnected] = useState(false);
     const toggleSwitch = () => setIsConnected(previousState => !previousState);
 
     return (
-        <FullBgContainer>
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.title}>CAP QCM</Text>
-                </View>
-                <View style={styles.codeContainer}>
-                    <Text style={styles.codeText}>Code de connexion reçu par e-mail:</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Entrez le code ici"
-                        placeholderTextColor="#D7CCC8"
-                        keyboardType="numeric"
-                    />
-                </View>
-                <View style={{
-                    flex: 0.4
-                }}>
-                    <View style={styles.switchContainer}>
-                        <FontAwesome name={isConnected ? "check-square" : "square-o"} size={24} color="white" />
-                        <Text style={styles.switchText}>Restez connecté(e)</Text>
-                        <Switch
-                            value={isConnected}
-                            onValueChange={toggleSwitch}
-                            thumbColor="white"
-                            trackColor={{ false: '#8B6A4F', true: '#8B6A4F' }}
-                        // style={styles.switch}
-                        />
-                    </View>
-                </View>
-
-                <View style={styles.button}>
-                    <Link style={styles.buttonText} href={"/(home)"}>Valider</Link>
-                </View>
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Annuler</Text>
-                </TouchableOpacity>
+      <FullBgContainer>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>CAP QCM</Text>
+          </View>
+          <View style={styles.codeContainer}>
+            <Text style={styles.codeText}>
+              Code de connexion reçu par e-mail:
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Entrez le code ici"
+              placeholderTextColor="#D7CCC8"
+              keyboardType="numeric"
+            />
+          </View>
+          <View
+            style={{
+              flex: 0.4,
+            }}
+          >
+            <View style={styles.switchContainer}>
+              <FontAwesome
+                name={isConnected ? "check-square" : "square-o"}
+                size={24}
+                color="white"
+              />
+              <Text style={styles.switchText}>Restez connecté(e)</Text>
+              <Switch
+                value={isConnected}
+                onValueChange={toggleSwitch}
+                thumbColor="white"
+                trackColor={{ false: "#8B6A4F", true: "#8B6A4F" }}
+                // style={styles.switch}
+              />
             </View>
-        </FullBgContainer>
-    );
+          </View>
+
+          <View style={styles.button}>
+            <Link style={styles.buttonText} href={"/(home)"}>
+              <Text>Valider</Text>
+            </Link>
+          </View>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Annuler</Text>
+          </TouchableOpacity>
+        </View>
+      </FullBgContainer>
+    )
 };
 
 const styles = StyleSheet.create({

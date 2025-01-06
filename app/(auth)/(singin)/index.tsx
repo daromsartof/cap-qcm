@@ -1,45 +1,51 @@
 import HalfBgContainer from '@/components/HalfBgContainer';
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ThemedText as Text } from "@/components/ThemedText"
 const SinginScreen = () => {
     const [email, setEmail] = useState('');
     const [pseudo, setPseudo] = useState('');
     return (
-        <HalfBgContainer>
-            <View style={{
-                flex: 1
-            }}>
-                <View style={styles.header}>
-                    <Text style={styles.title}>CAP QCM</Text>
-                </View>
+      <HalfBgContainer>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>CAP QCM</Text>
+          </View>
 
-                <View style={styles.formContainer}>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="E-mail"
-                            placeholderTextColor="#FFFFFF"
-                            keyboardType="email-address"
-                            value={email}
-                            onChangeText={setEmail}
-                        />
-                    </View>
-                </View>
-
-                <View style={styles.footer}>
-                    <View style={styles.button}>
-                        <Link style={styles.buttonText} href={"/(auth)/(singin)/secondauth"}>Valider</Link>
-                    </View>
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>Annuler</Text>
-                    </TouchableOpacity>
-                </View>
+          <View style={styles.formContainer}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="E-mail"
+                placeholderTextColor="#FFFFFF"
+                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
+              />
             </View>
+          </View>
 
-        </HalfBgContainer>
-    );
+          <View style={styles.footer}>
+            <View style={styles.button}>
+              <Link
+                style={styles.buttonText}
+                href={"/(auth)/(singin)/secondauth"}
+              >
+                <Text>Valider</Text>
+              </Link>
+            </View>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Annuler</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </HalfBgContainer>
+    )
 };
 
 const styles = StyleSheet.create({

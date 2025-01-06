@@ -1,9 +1,20 @@
 import FullBgContainer from '@/components/FullBgContainer';
-import { Link } from 'expo-router';
-import React from 'react';
-import { View, Text, StyleSheet, Touchable } from 'react-native';
-
+import { useRouter } from "expo-router"
+import React, { useEffect } from 'react';
+import { View, StyleSheet, Touchable } from 'react-native';
+import { ThemedText as Text } from "@/components/ThemedText"
+import {  } from "expo-router"
 const WelcomeComponent = () => {
+    
+   const router = useRouter()
+
+   useEffect(() => {
+     const timer = setTimeout(() => {
+       router.push('/(auth)/login') 
+     }, 3000) 
+
+     return () => clearTimeout(timer) 
+   }, [router])
     return (
         <FullBgContainer>
             <View style={styles.container}>
@@ -19,9 +30,6 @@ const WelcomeComponent = () => {
                     </View>
                 </View>
             </View>
-            <Link  href={"/(auth)/login"}>
-                <Text style={{ color: 'white', fontSize: 16 }}>Commencer</Text>
-            </Link>
         </FullBgContainer>
     );
 };

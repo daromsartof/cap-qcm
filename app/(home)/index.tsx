@@ -1,8 +1,8 @@
 import HalfBgContainer from '@/components/HalfBgContainer';
 import { Colors } from '@/constants/Colors';
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { ThemedText as Text } from "@/components/ThemedText"
 const HomeScreen = () => {
     const [selectedRole, setSelectedRole] = useState('Agent');
 

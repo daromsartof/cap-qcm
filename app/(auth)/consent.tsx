@@ -1,30 +1,42 @@
 import FullBgContainer from '@/components/FullBgContainer';
 import { Link } from 'expo-router';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { ThemedText as Text } from "@/components/ThemedText"
 const ConsentScreen = () => {
   return (
     <FullBgContainer style={styles.container}>
       <Text style={styles.title}>CAP QCM</Text>
       <Text style={styles.description}>
-        Cap-qcm veille au respect de la protection des données de l'utilisateur et{' '}
-        <Text style={styles.boldText}>n'utilise QU’UN SEUL COOKIE de suivi d’activité.</Text>{'\n'}
-        Aucun cookie d’identification n’est utilisé.{'\n\n'}
-        Pour votre inscription, <Text style={styles.boldText}>n'utilisez donc AUCUNE information vous concernant</Text>
-        (nom, prénom, surnom, age, sexe, localisation...) et <Text style={styles.boldText}>n'utilisez pas</Text> une
-        adresse mail permettant de vous identifier (nom.prénom@nomdedomaine), ni une adresse mail personnelle
-        habituelle, ni une adresse mail professionnelle.{'\n\n'}
-        Un compte créé avec des informations qui permettraient de vous identifier sera clôturé.
+        Cap-qcm veille au respect de la protection des données de l'utilisateur
+        et{" "}
+        <Text style={styles.boldText}>
+          n'utilise QU’UN SEUL COOKIE de suivi d’activité.
+        </Text>
+        {"\n"}
+        Aucun cookie d’identification n’est utilisé.{"\n\n"}
+        Pour votre inscription,{" "}
+        <Text style={styles.boldText}>
+          n'utilisez donc AUCUNE information vous concernant
+        </Text>
+        (nom, prénom, surnom, age, sexe, localisation...) et{" "}
+        <Text style={styles.boldText}>n'utilisez pas</Text> une adresse mail
+        permettant de vous identifier (nom.prénom@nomdedomaine), ni une adresse
+        mail personnelle habituelle, ni une adresse mail professionnelle.
+        {"\n\n"}
+        Un compte créé avec des informations qui permettraient de vous
+        identifier sera clôturé.
       </Text>
       <TouchableOpacity style={styles.buttonAgree}>
-        <Link style={styles.buttonText} href={"/(auth)/singup"}>J’ai compris et je suis d’accord</Link>
+        <Link style={styles.buttonText} href={"/(auth)/singup"}>
+          <Text>J’ai compris et je suis d’accord</Text>
+        </Link>
       </TouchableOpacity>
       <View style={styles.buttonDisagree}>
         <Text style={styles.buttonText}>Je ne suis pas d’accord</Text>
       </View>
     </FullBgContainer>
-  );
+  )
 };
 
 const styles = StyleSheet.create({

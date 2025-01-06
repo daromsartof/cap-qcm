@@ -1,7 +1,7 @@
 import FullBgContainer from '@/components/FullBgContainer';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { ThemedText as Text} from '@/components/ThemedText'
 const AccountCreatedScreen = () => {
   return (
     <FullBgContainer style={styles.container}>
