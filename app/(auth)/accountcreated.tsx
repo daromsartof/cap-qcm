@@ -2,16 +2,22 @@ import FullBgContainer from '@/components/FullBgContainer';
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedText as Text} from '@/components/ThemedText'
+import { useSearchParams } from 'expo-router/build/hooks';
 const AccountCreatedScreen = () => {
+  const params = useSearchParams()
+  console.log(params)
+  
   return (
     <FullBgContainer style={styles.container}>
       <Text style={styles.title}>CAP QCM</Text>
       
       <View style={styles.messageContainer}>
-        <Text style={styles.messageText}>Bonjour pseudo001!</Text>
+        <Text style={styles.messageText}>Bonjour {""} !</Text>
         <Text style={styles.messageText}>Votre compte est créé.</Text>
         <Text style={styles.messageText}>
-          Pour vous connecter, et à chaque connexion, un code <Text style={styles.boldText}>de sécurité vous sera</Text> envoyé sur l’adresse mail que vous avez indiqué.
+          Pour vous connecter, et à chaque connexion, un code 
+          <Text style={styles.boldText}>de sécurité vous sera</Text> 
+          envoyé sur l’adresse mail {""} que vous avez indiqué.
         </Text>
       </View>
       
