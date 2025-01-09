@@ -43,9 +43,6 @@ const HomeScreen = () => {
                     <TouchableOpacity style={styles.button}>
                         <Text style={styles.buttonText}>Valider</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>Annuler</Text>
-                    </TouchableOpacity>
                 </View>
 
             </View>

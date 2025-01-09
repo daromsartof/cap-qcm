@@ -1,6 +1,8 @@
+
 import * as SecureStore from "expo-secure-store"
+
 import axiosClient from "./axio.service"
-import { API_URL } from "@/constants/Url"
+import { API_URL, DEFAULT_PASSWORD } from "@/constants/Url"
 import { User } from "@/types/User"
 
 const register = async ({
@@ -26,6 +28,24 @@ const register = async ({
       roles: [data.user.roles]
     }
   } catch (error: any) {
+    throw error
+  }
+}
+
+const login = async ({ email }: { email: string }): Promise<User> => {
+  try {
+    const { data } = await axiosClient.post(API_URL.LOGIN, {
+      email,
+      password: DEFAULT_PASSWORD
+    })
+
+    return {
+      id: data.user.id,
+      pseudo: data.user.name,
+      email: data.user.email,
+      roles: [data.user.roles]
+    }
+  } catch (error) { 
     throw error
   }
 }
@@ -59,4 +79,46 @@ const deleteToken = async () => {
     console.error("Error deleting token:", error)
   }
 }
-export { register, getToken, storeToken }
+
+const sendVerificationEmail = async ({
+  email
+}: {
+  email: string
+}): Promise<Boolean> => {
+  try {
+     const { data } = await axiosClient.post(`${API_URL.LOGIN}/send-code`, {
+       email
+     })
+     return data.status === "ok"
+  } catch (error) {
+    return false
+  }
+}
+
+const verifyEmail = async ({
+  email,
+  code
+}: {
+  email: string,
+  code: string
+}) => {
+  try {
+    const { data } = await axiosClient.post(`${API_URL.LOGIN}/verifiy-code`, {
+      email,
+      code
+    })
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export {
+  register,
+  sendVerificationEmail,
+  getToken,
+  storeToken,
+  login,
+  deleteToken,
+  verifyEmail,
+}

@@ -1,11 +1,32 @@
 import HalfBgContainer from '@/components/HalfBgContainer';
-import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { ThemedText as Text } from "@/components/ThemedText"
+import { useAuth } from '@/contexts/AutContext';
+import { useToast } from '@/hooks/useToast';
 const SinginScreen = () => {
-    const [email, setEmail] = useState('');
-    const [pseudo, setPseudo] = useState('');
+    const [email, setEmail] = useState('')
+    const [loading, setloading] = useState(false)
+    const toast = useToast()
+    const {
+      login
+    } = useAuth()
+    const handlelogin = async () => {
+      if (!email) {
+        return toast.info('Please', 'Email is required')
+      }
+      try {
+        setloading(true)
+         await login(email)
+      } catch (error) {
+        console.log(error)
+        
+      } finally {
+        setloading(false)
+      }
+     
+    }
+
     return (
       <HalfBgContainer>
         <View
@@ -31,14 +52,9 @@ const SinginScreen = () => {
           </View>
 
           <View style={styles.footer}>
-            <View style={styles.button}>
-              <Link
-                style={styles.buttonText}
-                href={"/(auth)/(singin)/secondauth"}
-              >
-                <Text>Valider</Text>
-              </Link>
-            </View>
+            <TouchableOpacity style={styles.button} onPress={handlelogin}>
+              <Text style={styles.buttonText}>{loading ? <ActivityIndicator  size={"small"} /> : "Valider"}</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText}>Annuler</Text>
             </TouchableOpacity>

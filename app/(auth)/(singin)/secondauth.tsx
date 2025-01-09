@@ -4,10 +4,40 @@ import { FontAwesome } from '@expo/vector-icons';
 import FullBgContainer from '@/components/FullBgContainer';
 import { Link } from 'expo-router';
 import { ThemedText as Text } from "@/components/ThemedText"
+import { useAuth } from '@/contexts/AutContext';
+import { ActivityIndicator } from 'react-native-paper';
+import { useToast } from '@/hooks/useToast';
+import { sendVerificationEmail } from '@/services/auth.service';
 const ConnectionCodeScreen = () => {
-    const [isConnected, setIsConnected] = useState(false);
-    const toggleSwitch = () => setIsConnected(previousState => !previousState);
+    const [isConnected, setIsConnected] = useState(true)
+    const [code, setCode] = useState("")
+     const toast = useToast()
+    const [loading, setLoading] = useState(false)
+    const { verifyCode, email } = useAuth()
+    const toggleSwitch = () => setIsConnected(previousState => !previousState)
 
+    const handleValider = async () => {
+      try {
+        setLoading(true)
+        await verifyCode(code, isConnected)
+      } catch (error: any) {
+        toast.error("Error", error.error || error.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const handleResend = async () => {
+      try {
+        await sendVerificationEmail({ email })
+        toast.success(
+          'Success',
+          'Code de connexion renvoyé'
+        )
+      } catch (error: any) {
+        toast.error("Error", error.error || error.message)
+      }
+    }
     return (
       <FullBgContainer>
         <View style={styles.container}>
@@ -22,9 +52,22 @@ const ConnectionCodeScreen = () => {
               style={styles.input}
               placeholder="Entrez le code ici"
               placeholderTextColor="#D7CCC8"
+              value={code}
+              onChangeText={setCode}
               keyboardType="numeric"
             />
           </View>
+          <TouchableOpacity style={{
+            marginBottom: 20,
+            width: "100%",
+            alignItems: "flex-end"
+          }} onPress={handleResend}>
+            <Text>
+              Code non Reçue <Text style={{
+                color: 'green'
+              }}>Renvoyé</Text>
+            </Text>
+          </TouchableOpacity>
           <View
             style={{
               flex: 0.4,
@@ -46,12 +89,11 @@ const ConnectionCodeScreen = () => {
               />
             </View>
           </View>
-
-          <View style={styles.button}>
-            <Link style={styles.buttonText} href={"/(home)"}>
-              <Text>Valider</Text>
-            </Link>
-          </View>
+          <TouchableOpacity style={styles.button} onPress={handleValider}>
+            <Text style={styles.buttonText}>
+              {loading ? <ActivityIndicator size={"small"} /> : "Valider"}
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Annuler</Text>
           </TouchableOpacity>
@@ -87,7 +129,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 10,
         width: '100%',
-        marginBottom: 20,
+        marginBottom: 10,
     },
     codeText: {
         color: 'white',
