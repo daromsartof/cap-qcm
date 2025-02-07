@@ -5,6 +5,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import Animated, { useSharedValue, withTiming, useAnimatedStyle, withDelay, withRepeat } from 'react-native-reanimated';
 import { Link, useRouter } from 'expo-router';
 import { ThemedText as Text } from "@/components/ThemedText"
+import * as SecureStore from "expo-secure-store"
+
 const WelcomeComponent = () => {
     const iconOpacity1 = useSharedValue(0);
     const iconOpacity2 = useSharedValue(0);
@@ -31,7 +33,19 @@ const WelcomeComponent = () => {
 
    useEffect(() => {
      const timer = setTimeout(() => {
-       router.push("/(auth)/login")
+        const checkAuth = async () => {
+              const token = await SecureStore.getItemAsync("userToken")
+              console.log("here is token", token)
+              
+              if(!!token) {
+                router.push("/(home)")
+              } else {
+                
+                router.push("/(auth)/login")
+              }
+            }
+        
+            checkAuth()
      }, 6000)
 
      return () => clearTimeout(timer)

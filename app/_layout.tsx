@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native"
 import { useFonts } from "expo-font"
-import { Stack } from "expo-router"
+import { Slot } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { useEffect } from "react"
 import "react-native-reanimated"
@@ -41,12 +41,7 @@ export default function RootLayout() {
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
             children={undefined}
           >
-            <Stack>
-              <Stack.Screen name="(home)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-
-              <Stack.Screen name="+not-found" />
-            </Stack>
+            <Slot />
           </ThemeProvider>
         </AuthProvider>
       </ToastProvider>
