@@ -91,6 +91,8 @@ const sendVerificationEmail = async ({
      })
      return data.status === "ok"
   } catch (error) {
+    console.log(error)
+    
     return false
   }
 }
