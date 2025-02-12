@@ -1,12 +1,13 @@
 import HalfBgContainer from "@/components/HalfBgContainer"
 import { Colors } from "@/constants/Colors"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { View, StyleSheet, ScrollView } from "react-native"
 import { ThemedText as Text } from "@/components/ThemedText"
 import { Link, useLocalSearchParams } from "expo-router"
-import { LinearGradient } from "expo-linear-gradient"
 import QuizList from "@/components/QuizList"
 import { useRouter } from "expo-router"
+import { getAllQuiz } from "@/services/quiz.service"
+import { Quiz } from "@/types/Quiz"
 
 const QuizTrainScreen = () => {
   const { categorie } = useLocalSearchParams<{
@@ -14,25 +15,23 @@ const QuizTrainScreen = () => {
   }>()
   const router = useRouter()
   const categorieData = categorie ? JSON.parse(categorie) : {}
+  const [quizs, setQuizs] = useState<Array<Quiz>>([])
 
-  // Mock data for quiz training options
-  const quizTrainings = [
-    {
-      id: 1,
-      title: "Quiz 1",
-      description: "Practice basic questions",
-      level: 3,
-      duration: 10,
-      questions: 15,
-    },
-    { id: 2, title: "Quiz 2", description: "Advanced level questions" },
-    { id: 3, title: "Quiz 3", description: "Timed challenge" },
-    { id: 4, title: "Quiz 4", description: "Mixed difficulty" },
-    { id: 5, title: "Quiz 5", description: "Practice basic questions" },
-    { id: 6, title: "Quiz 6", description: "Advanced level questions" },
-    { id: 7, title: "Quiz 7", description: "Timed challenge" },
-    { id: 8, title: "Quiz 8", description: "Mixed difficulty" },
-  ]
+  const handleFetchQuiz = async () => {
+    const quizs = await getAllQuiz({
+      categorieId: categorieData.id,
+    })
+
+    setQuizs(quizs)
+  }
+
+  useEffect(() => {
+    handleFetchQuiz()
+
+    return () => {
+      setQuizs([])
+    }
+  }, [categorie])
 
   return (
     <HalfBgContainer>
@@ -41,7 +40,7 @@ const QuizTrainScreen = () => {
           <Text style={styles.title}>CAP QCM</Text>
         </View>
         <QuizList
-          quizTrainings={quizTrainings}
+          quizTrainings={quizs}
           onPressQuiz={(quiz) => {
             router.push({
               pathname: "/(home)/(quiz)/qcm",

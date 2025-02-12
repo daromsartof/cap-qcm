@@ -4,9 +4,24 @@ import React from "react"
 export default function RootLayout() {
   return (
     <Stack>
-      <Stack.Screen name="home" />
-      <Stack.Screen name="train" />
-      <Stack.Screen name="qcm" />
+      <Stack.Screen
+        name="home"
+        options={{
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="train"
+        options={{
+          title: "Entrainement",
+        }}
+      />
+      <Stack.Screen
+        name="qcm"
+        options={{
+          title: "",
+        }}
+      />
       <Stack.Screen name="quiz" />
     </Stack>
   )

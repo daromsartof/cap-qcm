@@ -4,8 +4,12 @@ import { ThemedText as Text } from "@/components/ThemedText"
 import { LinearGradient } from "expo-linear-gradient"
 import { Colors } from "@/constants/Colors"
 import { MaterialIcons } from "@expo/vector-icons" // For star and other icons
+import { Quiz } from "@/types/Quiz"
 
-const QuizList = ({ quizTrainings, onPressQuiz }) => {
+const QuizList = ({ quizTrainings, onPressQuiz }: {
+  quizTrainings: Array<Quiz>
+  onPressQuiz: (quiz: Quiz) => void
+}) => {
   return (
     <ScrollView
       style={styles.quizListContainer}
@@ -44,14 +48,14 @@ const QuizList = ({ quizTrainings, onPressQuiz }) => {
                 color={Colors.light.icon}
                 style={styles.icon}
               />
-              <Text style={styles.quizInfo}>{quiz.duration} mins</Text>
+              <Text style={styles.quizInfo}>{quiz.time} mins</Text>
               <MaterialIcons
                 name="question-answer"
                 size={18}
                 color={Colors.light.icon}
                 style={styles.icon}
               />
-              <Text style={styles.quizInfo}>{quiz.questions} questions</Text>
+              <Text style={styles.quizInfo}>{quiz.quizQuestions.length} questions</Text>
             </View>
           </LinearGradient>
         </TouchableOpacity>

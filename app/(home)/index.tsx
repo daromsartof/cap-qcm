@@ -14,13 +14,14 @@ import { getAllCategories } from "@/services/categorie.service"
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { MaterialIcons } from "@expo/vector-icons"
+import { useAuth } from "@/contexts/AutContext"
 
 const HomeScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const router = useRouter()
   const [categories, setCategories] = useState<Categorie[]>([])
   const scaleValue = new Animated.Value(1)
-
+  const { logout  } = useAuth()
   const handleFetchCategories = async () => {
     const categories = await getAllCategories()
     setCategories(categories)
@@ -45,69 +46,121 @@ const HomeScreen = () => {
   }
 
   return (
-    <HalfBgContainer>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <LinearGradient
-            colors={[Colors.light.bgPrimary, Colors.light.active]}
-            style={styles.titleContainer}
-          >
-            <Text style={styles.title}>CAP QCM</Text>
-            <Text style={styles.subtitle}>Maîtrisez vos examens</Text>
-          </LinearGradient>
-          <MaterialIcons
-            name="school"
-            size={40}
-            color="white"
-            style={styles.icon}
-          />
-        </View>
+    <ScrollView style={styles.scrollView}>
+      <HalfBgContainer>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <LinearGradient
+              colors={[Colors.light.bgPrimary, Colors.light.active]}
+              style={styles.titleContainer}
+            >
+              <Text style={styles.title}>CAP QCM</Text>
+              <Text style={styles.subtitle}>Maîtrisez vos examens</Text>
+            </LinearGradient>
+            <MaterialIcons
+              name="school"
+              size={40}
+              color="white"
+              style={styles.icon}
+            />
+          </View>
 
-        <View style={styles.content}>
-          <Text style={styles.sectionTitle}>Choisissez votre catégorie</Text>
-          <View style={styles.gridContainer}>
-            {categories.map((categorie) => (
-              <Animated.View
-                key={categorie.id}
-                style={{ transform: [{ scale: scaleValue }] }}
-              >
-                <TouchableOpacity
-                  style={styles.categoryCard}
-                  onPressIn={handlePressIn}
-                  onPressOut={handlePressOut}
-                  onPress={() => {
-                    router.push({
-                      pathname: "/(home)/(quiz)/home",
-                      params: { categorie: JSON.stringify(categorie) },
-                    })
-                  }}
+          <View style={styles.content}>
+            <Text style={styles.sectionTitle}>Choisissez votre catégorie</Text>
+            <View style={styles.gridContainer}>
+              {categories.map((categorie) => (
+                <Animated.View
+                  key={categorie.id}
+                  style={{ transform: [{ scale: scaleValue }] }}
                 >
-                  <LinearGradient
-                    colors={[Colors.light.active, Colors.light.bgPrimary]}
-                    style={styles.gradient}
+                  <TouchableOpacity
+                    style={styles.categoryCard}
+                    onPressIn={handlePressIn}
+                    onPressOut={handlePressOut}
+                    onPress={() => {
+                      router.push({
+                        pathname: "/(home)/(quiz)/home",
+                        params: { categorie: JSON.stringify(categorie) },
+                      })
+                    }}
                   >
-                    <MaterialIcons
-                      name="library-books"
-                      size={28}
-                      color="white"
-                    />
-                    <Text style={styles.categoryTitle}>{categorie.title}</Text>
-                    <Text style={styles.questionCount}>120 Questions</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </Animated.View>
-            ))}
+                    <LinearGradient
+                      colors={[Colors.light.active, Colors.light.bgPrimary]}
+                      style={styles.gradient}
+                    >
+                      <MaterialIcons
+                        name="library-books"
+                        size={28}
+                        color="white"
+                      />
+                      <Text style={styles.categoryTitle}>
+                        {categorie.title}
+                      </Text>
+                      <Text style={styles.questionCount}>120 Questions</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </Animated.View>
+              ))}
+            </View>
           </View>
-        </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Progression quotidienne : 75 %</Text>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: "75%" }]} />
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Progression quotidienne : 75 %
+            </Text>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: "75%" }]} />
+            </View>
+          </View>
+          <View
+            style={{
+              padding: 50,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity
+              onPress={logout}
+              style={{
+                backgroundColor: "white",
+                borderRadius: 10,
+                padding: 10,
+                elevation: 8,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 6,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.light.bgPrimary,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                <MaterialIcons
+                  name="logout"
+                  size={28}
+                  color={Colors.light.bgPrimary}
+                />
+              </Text>
+              <Text
+                style={[
+                  styles.questionCount,
+                  {
+                    color: Colors.light.bgPrimary,
+                  },
+                ]}
+              >
+                Se déconnecter
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </View>
-    </HalfBgContainer>
+      </HalfBgContainer>
+    </ScrollView>
   )
 }
 

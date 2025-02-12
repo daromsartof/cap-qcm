@@ -11,6 +11,7 @@ import {
 import { AntDesign } from "@expo/vector-icons"
 import { CircularProgressBase } from "react-native-circular-progress-indicator"
 import { Colors } from "@/constants/Colors"
+import { useLocalSearchParams } from "expo-router"
 
 const { width } = Dimensions.get("window")
 
@@ -53,6 +54,7 @@ const QuizScreen: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [isQuizFinished, setIsQuizFinished] = useState(false)
 
+  
   const questions = mockQuestions.filter(
     (q) => q.subjectId === selectedSubject?.id
   )

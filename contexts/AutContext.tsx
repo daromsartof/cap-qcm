@@ -9,6 +9,7 @@ const AuthContext = createContext({
   login: async (email: string) => {},
   verifyCode: async (code: string, saveToken: Boolean) => {},
   email: "",
+  logout: async () => {},
   loading: false
 })
 
@@ -33,6 +34,11 @@ export function AuthProvider({ children }: any) {
     }
   }
 
+  const logout = async () => {
+    await SecureStore.deleteItemAsync("userToken")
+    setUser(null)
+    router.push("/(auth)/login")
+  }
   const verifyCode = async (code: string, saveToken: Boolean) => {
     try {
       const result = await verifyEmail({
@@ -52,7 +58,7 @@ export function AuthProvider({ children }: any) {
   }  
 
   return (
-    <AuthContext.Provider value={{ user, login, email, loading, verifyCode }}>
+    <AuthContext.Provider value={{ user, logout, login, email, loading, verifyCode }}>
       {children}
     </AuthContext.Provider>
   )

@@ -1,75 +1,61 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Colors } from "@/constants/Colors"
 import { MaterialIcons } from "@expo/vector-icons"
+import { useLocalSearchParams } from "expo-router"
+import { Quiz } from "@/types/Quiz"
+import QuizCategory from "@/types/QuizCategory"
 
 const QuizQCM = ({  }) => {
-    const quizData = [
-      {
-        id: 1,
-        name: "Math",
-        questions: [
-          {
-            id: 1,
-            text: "What is 2 + 2?",
-            answers: [
-              { id: 1, text: "3" },
-              { id: 2, text: "4" },
-              { id: 3, text: "5" },
-              { id: 4, text: "6" },
-            ],
-          },
-          {
-            id: 2,
-            text: "What is 3 * 3?",
-            answers: [
-              { id: 1, text: "6" },
-              { id: 2, text: "9" },
-              { id: 3, text: "12" },
-              { id: 4, text: "15" },
-            ],
-          },
-        ],
-      },
-      {
-        id: 2,
-        name: "Science",
-        questions: [
-          {
-            id: 1,
-            text: "What is the chemical symbol for water?",
-            answers: [
-              { id: 1, text: "H2O" },
-              { id: 2, text: "CO2" },
-              { id: 3, text: "O2" },
-              { id: 4, text: "NaCl" },
-            ],
-          },
-          {
-            id: 2,
-            text: "What is the boiling point of water?",
-            answers: [
-              { id: 1, text: "50°C" },
-              { id: 2, text: "100°C" },
-              { id: 3, text: "150°C" },
-              { id: 4, text: "200°C" },
-            ],
-          },
-        ],
-      },
-    ]
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [timeLeft, setTimeLeft] = useState(600) // 10 minutes in seconds
-
+  const [quizData, setQuizData] = useState<QuizCategory[]>([])
+  const { quiz } = useLocalSearchParams<{
+    quiz: string
+  }>()
+  const quiz_data: Quiz | null = quiz ? JSON.parse(quiz) : null
+  const handleGetQuestionQuiz = (quiz: Quiz) => {
+    setQuizData(
+      quiz.quizMatieres.map((m) => ({
+        id: m.matiere.id,
+        name: m.matiere.title,
+        questions: quiz.quizQuestions
+          .filter((q) => q.question.matiereId === m.matiereId)
+          .map((q) => ({
+            id: q.id,
+            text: q.question.title,
+            answers: q.question.answers.map((a) => ({
+              id: a.id,
+              text: a.title,
+            })),
+          })),
+      }))
+    )
+    /*setQuizData(
+      quiz.quizMatieres.map((m) => ({
+        id: m.matiere.id,
+        name: m.matiere.title,
+        questions: quiz.quizQuestions.filter((q) => q.question.matiereId === m.matiereId).map(q => ({
+          id: q.id,
+          text: q.question.title,
+          answers: q.question.answers.map((a) => ({
+            id: a.id,
+            text: a.title,
+          })),
+        })),
+      }))
+    )*/
+  }
   // Timer countdown
   React.useEffect(() => {
     if (timeLeft > 0) {
@@ -80,6 +66,17 @@ const QuizQCM = ({  }) => {
     }
   }, [timeLeft])
 
+  useEffect(() => {
+    if (quiz_data) {
+      setTimeLeft(quiz_data.time * 60)
+      handleGetQuestionQuiz(quiz_data)
+    }
+
+    return () => {
+      setQuizData([])
+    }
+  }, [quiz])
+  
   // Handle answer selection
   const handleAnswerSelect = (answerId) => {
     setSelectedAnswers((prev) => ({
@@ -134,12 +131,25 @@ const QuizQCM = ({  }) => {
   }
 
   // Get current question data
-  const currentQuestion =
-    quizData[currentSubjectIndex].questions[currentQuestionIndex]
+  const currentQuestion: {
+    id: number
+    text: string
+    answers: {
+      id: number
+      text: string
+    }[]
+  } =
+    quizData.length > 0
+      ? quizData[currentSubjectIndex].questions[currentQuestionIndex]
+      : {
+          id: 0,
+          text: "",
+          answers: [],
+        }
 
   return (
     <LinearGradient
-      colors={[Colors.light.background, Colors.light.bgPrimary]}
+      colors={[Colors.light.background, Colors.light.background]}
       style={styles.container}
     >
       {/* Timer */}
@@ -178,32 +188,60 @@ const QuizQCM = ({  }) => {
       </View>
 
       {/* Question and Response Options */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.questionText}>{currentQuestion.text}</Text>
-        {currentQuestion.answers.map((answer) => (
-          <TouchableOpacity
-            key={answer.id}
-            style={[
-              styles.answerOption,
-              selectedAnswers[
-                `${currentSubjectIndex}-${currentQuestionIndex}`
-              ] === answer.id && styles.selectedAnswerOption,
-            ]}
-            onPress={() => handleAnswerSelect(answer.id)}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.questionContainer}>
+          <View
+            style={{
+              marginBottom: 40,
+              justifyContent: "center",
+              alignItems: "center",
+              borderBottomColor: Colors.light.bgPrimary,
+              borderBottomWidth: 1,
+            }}
           >
-            <Text
-              style={[
-                styles.answerText,
-                selectedAnswers[
-                  `${currentSubjectIndex}-${currentQuestionIndex}`
-                ] === answer.id && styles.selectedanswerText
-              ]}
-            >
-              {answer.text}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+            <Text style={styles.questionText}>{currentQuestion?.text}</Text>
+            <Image
+              source={require("../../../assets/images/question.png")}
+              style={{
+                width: "100%",
+                resizeMode: "contain",
+              }}
+            />
+          </View>
+          <View style={{ marginBottom: 20 }}>
+            <Image
+              source={require("../../../assets/images/response.png")}
+              style={{
+                width: "100%",
+                resizeMode: "contain",
+              }}
+            />
+            {currentQuestion?.answers.map((answer) => (
+              <TouchableOpacity
+                key={answer.id}
+                style={[
+                  styles.answerOption,
+                  selectedAnswers[
+                    `${currentSubjectIndex}-${currentQuestionIndex}`
+                  ] === answer.id && styles.selectedAnswerOption,
+                ]}
+                onPress={() => handleAnswerSelect(answer.id)}
+              >
+                <Text
+                  style={[
+                    styles.answerText,
+                    selectedAnswers[
+                      `${currentSubjectIndex}-${currentQuestionIndex}`
+                    ] === answer.id && styles.selectedanswerText,
+                  ]}
+                >
+                  {answer.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
 
       {/* Navigation Buttons (Prev/Next) */}
       <View style={styles.navigationContainer}>
@@ -212,7 +250,7 @@ const QuizQCM = ({  }) => {
           onPress={() => handleNavigation("prev")}
           disabled={currentSubjectIndex === 0 && currentQuestionIndex === 0}
         >
-          <Text style={styles.navButtonText}>Previous</Text>
+          <Text style={styles.navButtonText}>Précédent</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navButton}
@@ -223,13 +261,13 @@ const QuizQCM = ({  }) => {
               quizData[currentSubjectIndex].questions.length - 1
           }
         >
-          <Text style={styles.navButtonText}>Next</Text>
+          <Text style={styles.navButtonText}>Suivant</Text>
         </TouchableOpacity>
       </View>
 
       {/* Submit Button */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit Quiz</Text>
+        <Text style={styles.submitButtonText}>Soumettre le questionnaire</Text>
       </TouchableOpacity>
     </LinearGradient>
   )
@@ -281,8 +319,7 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: Colors.light.text,
-    marginBottom: 40,
+    color: Colors.light.text
   },
   answerOption: {
     padding: 15,

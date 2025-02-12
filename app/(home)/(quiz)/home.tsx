@@ -63,6 +63,7 @@ const HomeQuizScreen = () => {
               onPress={() => {
                 router.push({
                   pathname: "/(home)/(quiz)/train",
+                  params: { categorie: JSON.stringify(categorieData) },
                 })
               }}
               onPressOut={handlePressOut}

@@ -14,6 +14,7 @@ export const Colors = {
     icon: "#687076",
     tabIconDefault: "#687076",
     tabIconSelected: tintColorLight,
+    star: '#FFC107',
     bgPrimary: "#6D4C41",
     active: "#6D4C41",
     inactive: 'transparent'
