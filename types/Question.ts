@@ -11,6 +11,7 @@ export type Question = {
   categoryId: number
   matiereId: number
   fileUrl: string | null
+  response_file_url: string | null
   sourceId: number
   answers: Answer[]
 }

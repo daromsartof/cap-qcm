@@ -23,6 +23,12 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen name="quiz" />
+      <Stack.Screen name="result" options={{
+        headerShown: false
+      }} />
+       <Stack.Screen name="result-detail" options={{
+        headerShown: false
+      }} />
     </Stack>
   )
 }

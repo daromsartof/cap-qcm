@@ -10,10 +10,9 @@ const getAllQuiz = async ({
     try {
         const { data } = await axiosClient.get(API_URL.QUIZ, {
           params: {
-            categorieId,
+            categoryId: categorieId,
           },
         })
-
         return data
     } catch (error) {
         return []

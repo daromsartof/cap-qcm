@@ -17,7 +17,13 @@ export const Colors = {
     star: '#FFC107',
     bgPrimary: "#6D4C41",
     active: "#6D4C41",
-    inactive: 'transparent'
+    inactive: 'transparent',
+    success: "#34C759",  // Vert éclatant - Idéal pour succès et validations
+    error: "#FF3B30",    // Rouge vif - Idéal pour erreurs et alertes
+    purple: "#8E44AD",   // Violet élégant - Pour des éléments distinctifs
+    orange: "#FF9500",
+    textSecondary: "#9BA1A6",
+    primary: "#6D4C41"
   },
   dark: {
     text: "#ECEDEE",

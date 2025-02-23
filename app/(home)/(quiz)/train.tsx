@@ -21,11 +21,14 @@ const QuizTrainScreen = () => {
     const quizs = await getAllQuiz({
       categorieId: categorieData.id,
     })
-
+    console.log(quizs.length);
+    
     setQuizs(quizs)
   }
 
   useEffect(() => {
+    console.log(categorie)
+    
     handleFetchQuiz()
 
     return () => {

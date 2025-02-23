@@ -21,7 +21,7 @@ const HomeScreen = () => {
   const router = useRouter()
   const [categories, setCategories] = useState<Categorie[]>([])
   const scaleValue = new Animated.Value(1)
-  const { logout  } = useAuth()
+  const { logout } = useAuth()
   const handleFetchCategories = async () => {
     const categories = await getAllCategories()
     setCategories(categories)
@@ -46,8 +46,9 @@ const HomeScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.scrollView}>
-      <HalfBgContainer>
+
+    <HalfBgContainer>
+      <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           <View style={styles.header}>
             <LinearGradient
@@ -96,7 +97,7 @@ const HomeScreen = () => {
                       <Text style={styles.categoryTitle}>
                         {categorie.title}
                       </Text>
-                      <Text style={styles.questionCount}>120 Questions</Text>
+                      <Text style={styles.questionCount}>{categorie._count.questions} Questions</Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </Animated.View>
@@ -159,12 +160,16 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </HalfBgContainer>
-    </ScrollView>
+      </ScrollView>
+    </HalfBgContainer>
+
   )
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
     paddingBottom: 30,
@@ -220,7 +225,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   categoryCard: {
-   
+
     height: 160,
     marginBottom: 15,
     borderRadius: 20,

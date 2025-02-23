@@ -10,11 +10,17 @@ import {
 import { LinearGradient } from "expo-linear-gradient"
 import { Colors } from "@/constants/Colors"
 import { MaterialIcons } from "@expo/vector-icons"
-import { useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams, useRouter } from "expo-router"
 import { Quiz } from "@/types/Quiz"
 import QuizCategory from "@/types/QuizCategory"
+import { QuizMatieres } from "@/types/QuizMatieres"
+import { MAIN_URL } from "@/constants/Url"
+import { useAuth } from "@/contexts/AutContext"
+import { User } from "@/types/User"
+import { getQuizResult } from "@/services/userQuiz.service"
 
-const QuizQCM = ({  }) => {
+const QuizQCM = ({ }) => {
+  const router = useRouter()
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState({})
@@ -23,24 +29,41 @@ const QuizQCM = ({  }) => {
   const { quiz } = useLocalSearchParams<{
     quiz: string
   }>()
+  const [questionContainerWidth, setQuestionContainerWidth] = useState(0);
+  const [questionImageDimensions, setQuestionImageDimensions] = useState({ width: 0, height: 0 });
+  const [answerContainerWidth, setAnswerContainerWidth] = useState(0);
+  const [answerImageDimensions, setAnswerImageDimensions] = useState({ width: 0, height: 0 });
+  const [isLoading, setIsLoading] = useState(false)
   const quiz_data: Quiz | null = quiz ? JSON.parse(quiz) : null
+  const { user } = useAuth()
+
   const handleGetQuestionQuiz = (quiz: Quiz) => {
-    setQuizData(
-      quiz.quizMatieres.map((m) => ({
-        id: m.matiere.id,
-        name: m.matiere.title,
-        questions: quiz.quizQuestions
-          .filter((q) => q.question.matiereId === m.matiereId)
-          .map((q) => ({
-            id: q.id,
-            text: q.question.title,
-            answers: q.question.answers.map((a) => ({
-              id: a.id,
-              text: a.title,
+    setQuizData(() => {
+      let timeSeconde = 0
+      const quizData =  quiz.quizMatieres.map((m: QuizMatieres) => {
+          timeSeconde += (m.time * 60)
+          return ({
+          id: m.matiere.id,
+          name: m.matiere.title,
+          questions: quiz.quizQuestions
+            .filter((q) => q.question.matiereId === m.matiereId)
+            .map((q) => ({
+              id: q.question.id,
+              text: q.question.title,
+              image: q.question.fileUrl,
+              answerImage: q.question.response_file_url,
+              answers: q.question.answers.map((a) => ({
+                id: a.id,
+                text: a.title,
+              })),
             })),
-          })),
-      }))
-    )
+        })
+      })
+      console.log("timeSeconde", timeSeconde);
+      
+      setTimeLeft(timeSeconde)
+      return quizData
+    })
     /*setQuizData(
       quiz.quizMatieres.map((m) => ({
         id: m.matiere.id,
@@ -76,7 +99,7 @@ const QuizQCM = ({  }) => {
       setQuizData([])
     }
   }, [quiz])
-  
+
   // Handle answer selection
   const handleAnswerSelect = (answerId) => {
     setSelectedAnswers((prev) => ({
@@ -118,22 +141,46 @@ const QuizQCM = ({  }) => {
   }
 
   // Handle quiz submission
-  const handleSubmit = () => {
-    console.log("Selected Answers:", selectedAnswers)
-    alert("Quiz submitted successfully!")
+  const handleSubmit = async () => {
+    if (!quiz_data) return
+
+    const submissionData = {
+      quizId: quiz_data.id, // ID du quiz
+      userId: user?.user.id, // Remplace par l'ID de l'utilisateur (ex: depuis le contexte ou Redux)
+      data: Object.keys(selectedAnswers).map((key) => {
+        const [subjectIndex, questionIndex] = key.split("-").map(Number)
+        const question = quizData[subjectIndex]?.questions[questionIndex]
+        console.log("question ", question);
+        
+        return {
+          questionId: question?.id,
+          answerId: selectedAnswers[key],
+        }
+      }),
+    }
+    setIsLoading(true)
+    const results = await getQuizResult(submissionData)
+    setIsLoading(false)
+    router.push({
+      pathname: "/(home)/(quiz)/result",
+      params: { results: JSON.stringify(results) },
+    })
   }
 
   // Format time (mm:ss)
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`
-  }
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
   // Get current question data
   const currentQuestion: {
     id: number
     text: string
+    image: string | null
+    answerImage: string | null
     answers: {
       id: number
       text: string
@@ -142,11 +189,12 @@ const QuizQCM = ({  }) => {
     quizData.length > 0
       ? quizData[currentSubjectIndex].questions[currentQuestionIndex]
       : {
-          id: 0,
-          text: "",
-          answers: [],
-        }
-
+        id: 0,
+        text: "",
+        image: null,
+        answerImage: null,
+        answers: [],
+      }
   return (
     <LinearGradient
       colors={[Colors.light.background, Colors.light.background]}
@@ -198,31 +246,65 @@ const QuizQCM = ({  }) => {
               borderBottomColor: Colors.light.bgPrimary,
               borderBottomWidth: 1,
             }}
+            onLayout={(event) => {
+              const { width } = event.nativeEvent.layout;
+              setQuestionContainerWidth(width);
+            }}
           >
             <Text style={styles.questionText}>{currentQuestion?.text}</Text>
-            <Image
-              source={require("../../../assets/images/question.png")}
-              style={{
-                width: "100%",
-                resizeMode: "contain",
-              }}
-            />
+            {
+              currentQuestion.image && (
+                <Image
+                  source={{
+                    uri: `${MAIN_URL}${currentQuestion?.image}`
+                  }}
+                  style={{
+                    width: "100%",
+                    height: questionContainerWidth && questionImageDimensions.width
+                      ? (questionContainerWidth * questionImageDimensions.height / questionImageDimensions.width)
+                      : 300, // Fallback height
+                    resizeMode: "contain",
+                  }}
+                  onLoad={(event) => {
+                    const { width, height } = event.nativeEvent.source;
+                    setQuestionImageDimensions({ width, height });
+                  }}
+                />
+              )
+            }
           </View>
-          <View style={{ marginBottom: 20 }}>
-            <Image
-              source={require("../../../assets/images/response.png")}
-              style={{
-                width: "100%",
-                resizeMode: "contain",
-              }}
-            />
+          <View style={{ marginBottom: 20 }} onLayout={(event) => {
+            const { width } = event.nativeEvent.layout;
+            setAnswerContainerWidth(width);
+          }}>
+            {
+
+              currentQuestion.answerImage && (
+                <Image
+                  source={{
+                    uri: `${MAIN_URL}${currentQuestion?.answerImage}`
+                  }}
+                  style={{
+                    width: "100%",
+                    height: answerContainerWidth && answerImageDimensions.width
+                      ? (answerContainerWidth * answerImageDimensions.height / answerImageDimensions.width)
+                      : 300, // Fallback height
+                    resizeMode: "contain",
+                  }}
+                  onLoad={(event) => {
+                    const { width, height } = event.nativeEvent.source;
+                    setAnswerImageDimensions({ width, height });
+                  }}
+                />
+              )
+            }
             {currentQuestion?.answers.map((answer) => (
               <TouchableOpacity
                 key={answer.id}
                 style={[
                   styles.answerOption,
                   selectedAnswers[
-                    `${currentSubjectIndex}-${currentQuestionIndex}`
+                  `${currentSubjectIndex}-${currentQuestionIndex}`
                   ] === answer.id && styles.selectedAnswerOption,
                 ]}
                 onPress={() => handleAnswerSelect(answer.id)}
@@ -231,7 +313,7 @@ const QuizQCM = ({  }) => {
                   style={[
                     styles.answerText,
                     selectedAnswers[
-                      `${currentSubjectIndex}-${currentQuestionIndex}`
+                    `${currentSubjectIndex}-${currentQuestionIndex}`
                     ] === answer.id && styles.selectedanswerText,
                   ]}
                 >
@@ -258,7 +340,7 @@ const QuizQCM = ({  }) => {
           disabled={
             currentSubjectIndex === quizData.length - 1 &&
             currentQuestionIndex ===
-              quizData[currentSubjectIndex].questions.length - 1
+            quizData[currentSubjectIndex].questions.length - 1
           }
         >
           <Text style={styles.navButtonText}>Suivant</Text>
@@ -267,7 +349,11 @@ const QuizQCM = ({  }) => {
 
       {/* Submit Button */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Soumettre le questionnaire</Text>
+        <Text style={styles.submitButtonText}>
+          {
+            isLoading ? "En cours..." : "Soumettre le questionnaire"
+          }
+        </Text>
       </TouchableOpacity>
     </LinearGradient>
   )
@@ -332,7 +418,7 @@ const styles = StyleSheet.create({
   selectedAnswerOption: {
     backgroundColor: Colors.light.active,
   },
-  selectedanswerText:{
+  selectedanswerText: {
     color: "white",
     fontWeight: "bold",
   },

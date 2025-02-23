@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import * as SecureStore from "expo-secure-store"
 
 import { router } from "expo-router"
@@ -49,13 +49,30 @@ export function AuthProvider({ children }: any) {
         if (saveToken) {
           await SecureStore.setItemAsync("userToken", result.token)
         }
+        await SecureStore.setItemAsync("userInfo", JSON.stringify(result))
         setUser(result)
         router.push("/(home)")
       }
     } catch (error) {
       throw error
     }
-  }  
+  }
+
+  const handleGetUserInfo = async () => {
+    try {
+      const userInfo = await SecureStore.getItemAsync("userInfo")
+      if (userInfo) {
+        setUser(JSON.parse(userInfo))
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+  console.log(user);
+  
+  useEffect(() => {
+    handleGetUserInfo()
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, logout, login, email, loading, verifyCode }}>

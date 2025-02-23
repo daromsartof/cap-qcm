@@ -3,4 +3,7 @@ export type Categorie = {
   title: string;
   createdAt: string;
   isDeleted: boolean;
+  _count: {
+    questions: number;
+  }
 }

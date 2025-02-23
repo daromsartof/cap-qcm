@@ -12,6 +12,7 @@ type Question = {
 type QuizCategory = {
   id: number
   name: string
+  image: string | null
   questions: Question[]
 }
 

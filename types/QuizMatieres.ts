@@ -5,5 +5,6 @@ export type QuizMatieres = {
   quizId: number
   matiereId: number
   matiereOrder: number | null
-  matiere: Matiere
+  matiere: Matiere,
+  time: number
 }
