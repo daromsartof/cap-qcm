@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
 import {
   View,
-  Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
   Image,
+  useWindowDimensions,
 } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Colors } from "@/constants/Colors"
@@ -18,6 +18,8 @@ import { MAIN_URL } from "@/constants/Url"
 import { useAuth } from "@/contexts/AutContext"
 import { User } from "@/types/User"
 import { getQuizResult } from "@/services/userQuiz.service"
+import { Text } from "react-native-paper"
+import RenderHTML from "react-native-render-html"
 
 const QuizQCM = ({ }) => {
   const router = useRouter()
@@ -36,6 +38,7 @@ const QuizQCM = ({ }) => {
   const [isLoading, setIsLoading] = useState(false)
   const quiz_data: Quiz | null = quiz ? JSON.parse(quiz) : null
   const { user } = useAuth()
+  const { width } = useWindowDimensions()
 
   const handleGetQuestionQuiz = (quiz: Quiz) => {
     setQuizData(() => {
@@ -236,7 +239,7 @@ const QuizQCM = ({ }) => {
       </View>
 
       {/* Question and Response Options */}
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}  contentContainerStyle={styles.scrollContent}>
         <View style={styles.questionContainer}>
           <View
             style={{
@@ -251,7 +254,8 @@ const QuizQCM = ({ }) => {
               setQuestionContainerWidth(width);
             }}
           >
-            <Text style={styles.questionText}>{currentQuestion?.text}</Text>
+              <RenderHTML  contentWidth={width} source={{ html: `<p style="text-align:center; font-size:18px">${currentQuestion?.text}</p>` }} />
+        
             {
               currentQuestion.image && (
                 <Image
@@ -326,16 +330,25 @@ const QuizQCM = ({ }) => {
       </ScrollView>
 
       {/* Navigation Buttons (Prev/Next) */}
-      <View style={styles.navigationContainer}>
+      <View style={styles.floatingNavContainer}>
         <TouchableOpacity
-          style={styles.navButton}
+          style={[
+            styles.navArrow,
+            (currentSubjectIndex === 0 && currentQuestionIndex === 0) && styles.disabledArrow
+          ]}
           onPress={() => handleNavigation("prev")}
           disabled={currentSubjectIndex === 0 && currentQuestionIndex === 0}
         >
-          <Text style={styles.navButtonText}>Précédent</Text>
+          <MaterialIcons name="chevron-left" size={32} color="white" />
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={styles.navButton}
+          style={[
+            styles.navArrow,
+            (currentSubjectIndex === quizData.length - 1 &&
+              currentQuestionIndex ===
+              quizData[currentSubjectIndex].questions.length - 1) && styles.disabledArrow
+          ]}
           onPress={() => handleNavigation("next")}
           disabled={
             currentSubjectIndex === quizData.length - 1 &&
@@ -343,17 +356,27 @@ const QuizQCM = ({ }) => {
             quizData[currentSubjectIndex].questions.length - 1
           }
         >
-          <Text style={styles.navButtonText}>Suivant</Text>
+          <MaterialIcons name="chevron-right" size={32} color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Submit Button */}
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>
-          {
-            isLoading ? "En cours..." : "Soumettre le questionnaire"
-          }
-        </Text>
+      <TouchableOpacity 
+        style={styles.submitButton} 
+        onPress={handleSubmit}
+        disabled={isLoading}
+      >
+        <LinearGradient
+          colors={[Colors.light.primary, Colors.light.bgPrimary]}
+          style={styles.gradientButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <MaterialIcons name="send" size={20} color="white" />
+          <Text style={styles.submitButtonText}>
+            {isLoading ? "En cours..." : "Soumettre le questionnaire"}
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
     </LinearGradient>
   )
@@ -363,6 +386,60 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  scrollContent: {
+    paddingBottom: 120, // Space for floating elements
+  },
+  floatingNavContainer: {
+    position: 'absolute',
+    bottom: 120,
+    backgroundColor: Colors.light.background,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  navArrow: {
+    backgroundColor: Colors.light.active,
+    width: 120,
+    height: 50,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  disabledArrow: {
+    opacity: 0.5,
+  },
+  submitButton: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
+    borderRadius: 12,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  gradientButton: {
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   timerContainer: {
     flexDirection: "row",
@@ -399,7 +476,7 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     marginBottom: 20,
-    marginTop: 50,
+    marginTop: 20,
     flex: 1,
   },
   questionText: {
@@ -442,18 +519,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  submitButton: {
-    padding: 15,
-    borderRadius: 10,
-    backgroundColor: Colors.light.bgPrimary,
-    alignItems: "center",
-  },
-  submitButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  }
 })
 
 export default QuizQCM
