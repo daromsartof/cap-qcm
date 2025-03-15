@@ -21,7 +21,7 @@ import { getQuizResult } from "@/services/userQuiz.service"
 import { Text } from "react-native-paper"
 import RenderHTML from "react-native-render-html"
 
-const QuizQCM = ({ }) => {
+const QuizQCM = ({}) => {
   const router = useRouter()
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -31,10 +31,16 @@ const QuizQCM = ({ }) => {
   const { quiz } = useLocalSearchParams<{
     quiz: string
   }>()
-  const [questionContainerWidth, setQuestionContainerWidth] = useState(0);
-  const [questionImageDimensions, setQuestionImageDimensions] = useState({ width: 0, height: 0 });
-  const [answerContainerWidth, setAnswerContainerWidth] = useState(0);
-  const [answerImageDimensions, setAnswerImageDimensions] = useState({ width: 0, height: 0 });
+  const [questionContainerWidth, setQuestionContainerWidth] = useState(0)
+  const [questionImageDimensions, setQuestionImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  })
+  const [answerContainerWidth, setAnswerContainerWidth] = useState(0)
+  const [answerImageDimensions, setAnswerImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  })
   const [isLoading, setIsLoading] = useState(false)
   const quiz_data: Quiz | null = quiz ? JSON.parse(quiz) : null
   const { user } = useAuth()
@@ -43,9 +49,9 @@ const QuizQCM = ({ }) => {
   const handleGetQuestionQuiz = (quiz: Quiz) => {
     setQuizData(() => {
       let timeSeconde = 0
-      const quizData =  quiz.quizMatieres.map((m: QuizMatieres) => {
-          timeSeconde += (m.time * 60)
-          return ({
+      const quizData = quiz.quizMatieres.map((m: QuizMatieres) => {
+        timeSeconde += m.time * 60
+        return {
           id: m.matiere.id,
           name: m.matiere.title,
           questions: quiz.quizQuestions
@@ -60,10 +66,10 @@ const QuizQCM = ({ }) => {
                 text: a.title,
               })),
             })),
-        })
+        }
       })
-      console.log("timeSeconde", timeSeconde);
-      
+      console.log("timeSeconde", timeSeconde)
+
       setTimeLeft(timeSeconde)
       return quizData
     })
@@ -153,8 +159,8 @@ const QuizQCM = ({ }) => {
       data: Object.keys(selectedAnswers).map((key) => {
         const [subjectIndex, questionIndex] = key.split("-").map(Number)
         const question = quizData[subjectIndex]?.questions[questionIndex]
-        console.log("question ", question);
-        
+        console.log("question ", question)
+
         return {
           questionId: question?.id,
           answerId: selectedAnswers[key],
@@ -172,11 +178,13 @@ const QuizQCM = ({ }) => {
 
   // Format time (mm:ss)
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-  };
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${
+      secs < 10 ? "0" : ""
+    }${secs}`
+  }
 
   // Get current question data
   const currentQuestion: {
@@ -192,12 +200,12 @@ const QuizQCM = ({ }) => {
     quizData.length > 0
       ? quizData[currentSubjectIndex].questions[currentQuestionIndex]
       : {
-        id: 0,
-        text: "",
-        image: null,
-        answerImage: null,
-        answers: [],
-      }
+          id: 0,
+          text: "",
+          image: null,
+          answerImage: null,
+          answers: [],
+        }
   return (
     <LinearGradient
       colors={[Colors.light.background, Colors.light.background]}
@@ -239,7 +247,10 @@ const QuizQCM = ({ }) => {
       </View>
 
       {/* Question and Response Options */}
-      <ScrollView showsVerticalScrollIndicator={false}  contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         <View style={styles.questionContainer}>
           <View
             style={{
@@ -250,65 +261,73 @@ const QuizQCM = ({ }) => {
               borderBottomWidth: 1,
             }}
             onLayout={(event) => {
-              const { width } = event.nativeEvent.layout;
-              setQuestionContainerWidth(width);
+              const { width } = event.nativeEvent.layout
+              setQuestionContainerWidth(width)
             }}
           >
-              <RenderHTML  contentWidth={width} source={{ html: `<p style="text-align:center; font-size:18px">${currentQuestion?.text}</p>` }} />
-        
-            {
-              currentQuestion.image && (
-                <Image
-                  source={{
-                    uri: `${MAIN_URL}${currentQuestion?.image}`
-                  }}
-                  style={{
-                    width: "100%",
-                    height: questionContainerWidth && questionImageDimensions.width
-                      ? (questionContainerWidth * questionImageDimensions.height / questionImageDimensions.width)
-                      : 300, // Fallback height
-                    resizeMode: "contain",
-                  }}
-                  onLoad={(event) => {
-                    const { width, height } = event.nativeEvent.source;
-                    setQuestionImageDimensions({ width, height });
-                  }}
-                />
-              )
-            }
-          </View>
-          <View style={{ marginBottom: 20 }} onLayout={(event) => {
-            const { width } = event.nativeEvent.layout;
-            setAnswerContainerWidth(width);
-          }}>
-            {
+            <RenderHTML
+              contentWidth={width}
+              source={{
+                html: `<p style="text-align:center; font-size:18px">${currentQuestion?.text}</p>`,
+              }}
+            />
 
-              currentQuestion.answerImage && (
-                <Image
-                  source={{
-                    uri: `${MAIN_URL}${currentQuestion?.answerImage}`
-                  }}
-                  style={{
-                    width: "100%",
-                    height: answerContainerWidth && answerImageDimensions.width
-                      ? (answerContainerWidth * answerImageDimensions.height / answerImageDimensions.width)
+            {currentQuestion?.image && (
+              <Image
+                source={{
+                  uri: `${MAIN_URL}${currentQuestion?.image}`,
+                }}
+                style={{
+                  width: "100%",
+                  height:
+                    questionContainerWidth && questionImageDimensions.width
+                      ? (questionContainerWidth *
+                          questionImageDimensions.height) /
+                        questionImageDimensions.width
                       : 300, // Fallback height
-                    resizeMode: "contain",
-                  }}
-                  onLoad={(event) => {
-                    const { width, height } = event.nativeEvent.source;
-                    setAnswerImageDimensions({ width, height });
-                  }}
-                />
-              )
-            }
+                  resizeMode: "contain",
+                }}
+                onLoad={(event) => {
+                  const { width, height } = event.nativeEvent.source
+                  setQuestionImageDimensions({ width, height })
+                }}
+              />
+            )}
+          </View>
+          <View
+            style={{ marginBottom: 20 }}
+            onLayout={(event) => {
+              const { width } = event.nativeEvent.layout
+              setAnswerContainerWidth(width)
+            }}
+          >
+            {currentQuestion?.answerImage && (
+              <Image
+                source={{
+                  uri: `${MAIN_URL}${currentQuestion?.answerImage}`,
+                }}
+                style={{
+                  width: "100%",
+                  height:
+                    answerContainerWidth && answerImageDimensions.width
+                      ? (answerContainerWidth * answerImageDimensions.height) /
+                        answerImageDimensions.width
+                      : 300, // Fallback height
+                  resizeMode: "contain",
+                }}
+                onLoad={(event) => {
+                  const { width, height } = event.nativeEvent.source
+                  setAnswerImageDimensions({ width, height })
+                }}
+              />
+            )}
             {currentQuestion?.answers.map((answer) => (
               <TouchableOpacity
                 key={answer.id}
                 style={[
                   styles.answerOption,
                   selectedAnswers[
-                  `${currentSubjectIndex}-${currentQuestionIndex}`
+                    `${currentSubjectIndex}-${currentQuestionIndex}`
                   ] === answer.id && styles.selectedAnswerOption,
                 ]}
                 onPress={() => handleAnswerSelect(answer.id)}
@@ -317,7 +336,7 @@ const QuizQCM = ({ }) => {
                   style={[
                     styles.answerText,
                     selectedAnswers[
-                    `${currentSubjectIndex}-${currentQuestionIndex}`
+                      `${currentSubjectIndex}-${currentQuestionIndex}`
                     ] === answer.id && styles.selectedanswerText,
                   ]}
                 >
@@ -334,7 +353,9 @@ const QuizQCM = ({ }) => {
         <TouchableOpacity
           style={[
             styles.navArrow,
-            (currentSubjectIndex === 0 && currentQuestionIndex === 0) && styles.disabledArrow
+            currentSubjectIndex === 0 &&
+              currentQuestionIndex === 0 &&
+              styles.disabledArrow,
           ]}
           onPress={() => handleNavigation("prev")}
           disabled={currentSubjectIndex === 0 && currentQuestionIndex === 0}
@@ -345,15 +366,16 @@ const QuizQCM = ({ }) => {
         <TouchableOpacity
           style={[
             styles.navArrow,
-            (currentSubjectIndex === quizData.length - 1 &&
+            currentSubjectIndex === quizData.length - 1 &&
               currentQuestionIndex ===
-              quizData[currentSubjectIndex].questions.length - 1) && styles.disabledArrow
+                quizData[currentSubjectIndex].questions.length - 1 &&
+              styles.disabledArrow,
           ]}
           onPress={() => handleNavigation("next")}
           disabled={
             currentSubjectIndex === quizData.length - 1 &&
             currentQuestionIndex ===
-            quizData[currentSubjectIndex].questions.length - 1
+              quizData[currentSubjectIndex].questions.length - 1
           }
         >
           <MaterialIcons name="chevron-right" size={32} color="white" />
@@ -361,8 +383,8 @@ const QuizQCM = ({ }) => {
       </View>
 
       {/* Submit Button */}
-      <TouchableOpacity 
-        style={styles.submitButton} 
+      <TouchableOpacity
+        style={styles.submitButton}
         onPress={handleSubmit}
         disabled={isLoading}
       >
@@ -391,13 +413,13 @@ const styles = StyleSheet.create({
     paddingBottom: 120, // Space for floating elements
   },
   floatingNavContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 120,
     backgroundColor: Colors.light.background,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
   },
   navArrow: {
@@ -405,10 +427,10 @@ const styles = StyleSheet.create({
     width: 120,
     height: 50,
     borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -417,13 +439,13 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 40,
     left: 20,
     right: 20,
     borderRadius: 12,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -431,15 +453,15 @@ const styles = StyleSheet.create({
   gradientButton: {
     padding: 16,
     borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 10,
   },
   submitButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   timerContainer: {
     flexDirection: "row",
@@ -482,7 +504,7 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: Colors.light.text
+    color: Colors.light.text,
   },
   answerOption: {
     padding: 15,
@@ -519,7 +541,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-  }
+  },
 })
 
 export default QuizQCM

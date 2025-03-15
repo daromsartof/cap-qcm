@@ -1,4 +1,3 @@
-
 import * as SecureStore from "expo-secure-store"
 
 import axiosClient from "./axio.service"
@@ -25,7 +24,7 @@ const register = async ({
       id: data.user.id,
       pseudo: data.user.name,
       email: data.user.email,
-      roles: [data.user.roles]
+      roles: [data.user.roles],
     }
   } catch (error: any) {
     throw error
@@ -36,16 +35,16 @@ const login = async ({ email }: { email: string }): Promise<User> => {
   try {
     const { data } = await axiosClient.post(API_URL.LOGIN, {
       email,
-      password: DEFAULT_PASSWORD
+      password: DEFAULT_PASSWORD,
     })
 
     return {
       id: data.user.id,
       pseudo: data.user.name,
       email: data.user.email,
-      roles: [data.user.roles]
+      roles: [data.user.roles],
     }
-  } catch (error) { 
+  } catch (error) {
     throw error
   }
 }
@@ -81,33 +80,38 @@ const deleteToken = async () => {
 }
 
 const sendVerificationEmail = async ({
-  email
+  email,
 }: {
   email: string
 }): Promise<Boolean> => {
   try {
-     const { data } = await axiosClient.post(`${API_URL.LOGIN}/send-code`, {
-       email
-     })
-     return data.status === "ok"
+    const { data } = await axiosClient.post(`${API_URL.LOGIN}/send-code`, {
+      email,
+    })
+    return data.status === "ok"
   } catch (error) {
     console.log(error)
-    
+
     return false
   }
 }
 
 const verifyEmail = async ({
   email,
-  code
+  code,
 }: {
-  email: string,
+  email: string
   code: string
 }) => {
+  console.log({
+    email,
+    code,
+  })
+
   try {
     const { data } = await axiosClient.post(`${API_URL.LOGIN}/verifiy-code`, {
       email,
-      code
+      code,
     })
     return data
   } catch (error) {

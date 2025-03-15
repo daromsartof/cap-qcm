@@ -7,10 +7,14 @@ import { sendVerificationEmail, verifyEmail } from "@/services/auth.service"
 const AuthContext = createContext({
   user: null,
   login: async (email: string) => {},
-  verifyCode: async (code: string, saveToken: Boolean) => {},
+  verifyCode: async (
+    code: string,
+    saveToken: Boolean,
+    localEmail: string
+  ) => {},
   email: "",
   logout: async () => {},
-  loading: false
+  loading: false,
 })
 
 export function AuthProvider({ children }: any) {
@@ -21,7 +25,7 @@ export function AuthProvider({ children }: any) {
   const login = async (email: string) => {
     try {
       const response = await sendVerificationEmail({
-        email
+        email,
       })
       console.log(response)
 
@@ -39,11 +43,15 @@ export function AuthProvider({ children }: any) {
     setUser(null)
     router.push("/(auth)/login")
   }
-  const verifyCode = async (code: string, saveToken: Boolean) => {
+  const verifyCode = async (
+    code: string,
+    saveToken: Boolean,
+    localEmail: string
+  ) => {
     try {
       const result = await verifyEmail({
-        email,
-        code
+        email: email || localEmail,
+        code,
       })
       if (result) {
         if (saveToken) {
@@ -68,14 +76,16 @@ export function AuthProvider({ children }: any) {
       throw error
     }
   }
-  console.log(user);
-  
+  console.log(user)
+
   useEffect(() => {
     handleGetUserInfo()
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, logout, login, email, loading, verifyCode }}>
+    <AuthContext.Provider
+      value={{ user, logout, login, email, loading, verifyCode }}
+    >
       {children}
     </AuthContext.Provider>
   )
